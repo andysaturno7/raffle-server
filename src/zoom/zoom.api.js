@@ -74,7 +74,7 @@ export class ZoomAuthConnection {
             this.token_request = resToken;
             if(this.token_request) return this.token_request;
         } catch (error) {
-            console.log({error});
+            console.log({error: error.response});
             return false;
         }
     }
@@ -104,14 +104,24 @@ export class ZoomApiConnection {
         return axios.get(`${this.api_uri}users/me`, {headers}).then(res=>res.data);
     }
 
+    getUsersAccounts(){
+        let headers = this.apiHeadersAuthorization;
+        let params = {
+            status: "active",
+            page_size: "100",
+        }
+        return axios.get(`${this.api_uri}users`, {headers,params}).then(res=>res.data);
+    }
+
     getAllMetricsWM(wm, params = {type: "live", next_page_token: null}){
         let headers = this.apiHeadersAuthorization;
         return axios.get(`${this.api_uri}metrics/${wm}`, {headers, params}).then(res=>res.data);
     }
 
-    getAllWM(wm, params = {type: "live", next_page_token: null}){
+    getAllWM(wm, params = {type: "live", next_page_token: null}, account_id = undefined){
         let headers = this.apiHeadersAuthorization;
-        return axios.get(`${this.api_uri}users/me/${wm}`, {headers, params}).then(res=>res.data);
+        let user = (account_id)? account_id:"me";
+        return axios.get(`${this.api_uri}users/${user}/${wm}`, {headers, params}).then(res=>res.data);
     }
     
     getMetricsWM(wm, wmId, params = undefined){
